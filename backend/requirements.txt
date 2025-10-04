@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+pydantic
+motor
+python-dotenv
+google-generativeai
+transformers
+torch
+sendgrid
