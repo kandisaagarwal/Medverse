@@ -1,8 +1,10 @@
   const express = require('express');
-  const { callGemini } = require("./callGemini.js");
-  const { callDiagnosisAPI } = require("./callDiagnosisAPI.js")
+  const { callGemini } = require("../utils/callGemini.js");
+  const { callDiagnosisAPI } = require("../utils/callDiagnosisAPI.js")
   const router = express.Router();
   const Report = require("../models/Report");
+  const { getLatLong } = require("../utils/geocode.js");
+  const { assignVolunteer } = require("../utils/assignVolunteer.js")
 
   const structuredReportTemplate = {
     age: null,
@@ -12,11 +14,14 @@
     rawInput: null,
     symptoms: [],
     severity: null,
-    diagnosis: null,
+    diagnosis: [],              // now matches schema type [String]
     recommendedActions: [],
-    images: [] // optional
+    images: [],                 // optional base64 strings
+    location: {
+      type: 'Point',            // default type
+      coordinates: [0, 0]       // [longitude, latitude]
+    }
   };
-
 
   const SESSION_KEY = "demo-session"; // fixed session for MVP
 
@@ -147,10 +152,20 @@
         .map(item => item.label);    
         report.diagnosis = topThreeLabels;
 
+
+        //add latitude and longitude
+        const { lat, long } = await getLatLong(report.city, report.country);
+        report.location = {
+          type: "Point",
+          coordinates: [long, lat] // note: GeoJSON expects [longitude, latitude]
+        };
+
+
         //send to the database
         try {
           const savedReport = await Report.create(report); // stores report in MongoDB
           console.log("Report saved:", savedReport._id);
+          assignVolunteer(savedReport.id);
         } catch (err) {
           console.error("Failed to save report to DB:", err);
           return res.status(500).json({ error: "Failed to save report" });
