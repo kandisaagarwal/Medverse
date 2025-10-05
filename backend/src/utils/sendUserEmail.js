@@ -29,4 +29,28 @@ async function sendHealthReportEmail(report, pdfBase64) {
   }
 }
 
-module.exports = { sendHealthReportEmail };
+
+async function sendHealthReportEmailSupervisor(report, pdfBytes, approveLink, rejectLink) {
+  try {
+    await resend.emails.send({
+      from: "medvers@whisperandvault.xyz",
+      to: report.supervisorEmail, // send to supervisor
+      subject: "Medverse Report Approval Needed",
+      html: `<p>Dear Supervisor,</p>
+             <p>Please review the attached prescription and take action:</p>
+             <p>
+               <a href="${approveLink}">Approve</a> | 
+               <a href="${rejectLink}">Reject</a>
+             </p>`,
+      attachments: [
+        { filename: "Medverse_Report.pdf", content: pdfBytes }
+      ]
+    });
+    console.log(`Email sent to ${report.supervisorEmail}`);
+  } catch (err) {
+    console.error("Failed to send email:", err);
+    throw err;
+  }
+}
+
+module.exports = { sendHealthReportEmail, sendHealthReportEmailSupervisor };

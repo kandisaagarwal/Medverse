@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const crypto = require("crypto");
 const Volunteer = require("../models/Volunteer")
 const Report = require("../models/Report")
 const { getLatLong } = require("../utils/geocode")
-const { sendHealthReportEmail } = require('../utils/sendUserEmail')
+const { sendHealthReportEmail,sendHealthReportEmailSupervisor } = require('../utils/sendUserEmail')
 const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
 
 router.post("/addVolunteer", async (req, res) => {
@@ -101,7 +102,6 @@ router.post("/getFirst", async (req, res) => {
 router.post("/report/:id/accept", async (req, res) => {
   try {
     //find report
-    console.log("Params:", req.params);
     const report = await Report.findById(req.params.id);
     if (!report) return res.status(404).json({ error: "Report not found" });
 
@@ -156,6 +156,133 @@ router.post("/report/:id/accept", async (req, res) => {
   }
 });
 
+//if it is out of scope
+router.post("/report/:id/outOfScope", async (req, res) => {
+  try{
+      //find report
+    const report = await Report.findById(req.params.id);
+    if (!report) return res.status(404).json({ error: "Report not found" });
+    
+    //change status and update db to reflect
+    report.status = "outOfScope";
+    await report.save();
+
+    res.status(200).json("Report marked as out of scope")
+  }
+  catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+})
+
+
+router.post("/report/:id/followUp", async (req,res) => {
+  try{
+     //find report
+    const report = await Report.findById(req.params.id);
+    if (!report) return res.status(404).json({ error: "Report not found" });
+
+    //change status and save
+    report.status = "followUp";
+    await report.save();
+
+    //send response
+    res.status(200).json("Report marked for follow up")
+  }
+  catch (err) {
+    console.log(err);
+    res.status(500).json({error: "Server error"})
+  }
+})
+
+router.post("/report/:id/prescribe", async (req, res) => {
+  try {
+    const { prescription } = req.body;
+
+    const report = await Report.findById(req.params.id);
+    if (!report) return res.status(404).json({ error: "Report not found" });
+
+    // generate a random token
+    const token = crypto.randomBytes(16).toString("hex");
+    report.status = "awaitingApproval";
+    report.prescription = prescription || "";
+    report.approvalToken = token;
+    await report.save();
+
+    // generate PDF (same as before)
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([600, 700]);
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    let textY = 680;
+    const addLine = (text) => { page.drawText(text, { x: 50, y: textY, size: 12, font }); textY -= 20; };
+    addLine(`Report ID: ${report._id}`);
+    addLine(`Prescription: ${report.prescription}`);
+    const pdfBytes = await pdfDoc.save();
+    const base64Pdf = Buffer.from(pdfBytes).toString("base64");
+
+    // send email with approve/reject links
+    const approveLink = `https://your-app.com/volunteer/report/${report._id}/approve?token=${token}`;
+    const rejectLink = `https://your-app.com/volunteer/report/${report._id}/reject?token=${token}`;
+
+    await sendHealthReportEmailSupervisor(report, base64Pdf, approveLink, rejectLink);
+
+    res.status(200).json({ message: "Report marked awaiting approval and emailed to supervisor.", report });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+//route to approve a report
+router.get("/report/:id/approve", async (req, res) => {
+  const { token } = req.query;
+  const { id } = req.params;
+
+  try {
+    const report = await Report.findById(id);
+    if (!report || report.approvalToken !== token) {
+      return res.status(403).send("Invalid or expired token.");
+    }
+
+    report.status = "completed";
+    report.supervisorAction = "approved";
+    report.approvalToken = null; // invalidate token
+    await report.save();
+
+    res.send("Prescription approved");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+//route to reject a report
+router.get("/report/:id/reject", async (req, res) => {
+  const { token } = req.query;
+  const { id } = req.params;
+
+  try {
+    const report = await Report.findById(id);
+    if (!report || report.approvalToken !== token) {
+      return res.status(403).send("Invalid or expired token.");
+    }
+
+    //back to pending
+    report.status = "pending";
+    report.supervisorAction = "rejected";
+    report.approvalToken = null; // invalidate token
+    await report.save();
+
+    //assing a new volunteer
+    await assignVolunteer(report.id);
+
+    res.send("Prescription rejected");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
 
 
 
