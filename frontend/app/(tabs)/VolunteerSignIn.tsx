@@ -208,8 +208,14 @@ const VolunteerSignIn: React.FC = () => {
         // Store token or user data if needed
         // For example: await AsyncStorage.setItem('token', data.token);
         
+        //get id
+        const volunteerId = data.volunteerId;
+
         // Navigate to volunteer dashboard
-        router.push('/(tabs)/Volunteer');
+        router.push({
+          pathname: '/(tabs)/Volunteer',
+          params: { volunteerId },   // pass it here
+        });
         
       } catch (error) {
         console.error('Sign in error:', error);

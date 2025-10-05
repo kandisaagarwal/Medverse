@@ -178,6 +178,7 @@ import '../styles/volunteer.css';
 import { ClipboardList, User, MapPin, Calendar, RefreshCw } from 'lucide-react';
 import { router } from 'expo-router';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
+import { useLocalSearchParams } from 'expo-router';
 
 interface Case {
   id: number;
@@ -196,11 +197,14 @@ const Volunteer: React.FC = () => {
   const [cases, setCases] = useState<Case[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [volunteerId, setVolunteerId] = useState<string | null>(null);
+  // const [volunteerId, setVolunteerId] = useState<string | null>(null);
 
+  const params = useLocalSearchParams();
+  const volunteerId = params.volunteerId as string; 
+  console.log("volunteer id is: " , params.volunteerId)
+  
   // Fetch cases from backend API
   const fetchCases = async () => {
-  const demoVolunteerId = '68e243ce4bbacf29c6509377';
   try {
     const response = await fetch('http://localhost:3000/volunteer/getFirst', {
       method: 'POST',
@@ -208,7 +212,7 @@ const Volunteer: React.FC = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        volunteer_id: demoVolunteerId
+        volunteer_id: volunteerId
       })
     });
 

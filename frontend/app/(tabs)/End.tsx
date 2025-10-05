@@ -26,6 +26,7 @@ export default function End() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prefilledDemographics: demographics }),
       });
+
       setShowConfirm(false);
       setShowThanks(true);
     } catch (error) {
