@@ -1,5 +1,5 @@
 // backend/src/index.js
-const cors = require('cors');
+const cors = require("cors")
 const dotenv = require("dotenv");
 const express = require("express");
 const mongoose = require("mongoose");
