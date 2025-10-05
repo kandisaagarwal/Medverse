@@ -9,8 +9,8 @@ const VolunteerLogin: React.FC = () => {
     name: '',
     school: '',
     supervisorEmail: '',
-    latitude: '',
-    longitude: ''
+    city: '',
+    country: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -44,14 +44,6 @@ const VolunteerLogin: React.FC = () => {
       newErrors.supervisorEmail = 'Invalid email format';
     }
 
-    if (formData.latitude && isNaN(Number(formData.latitude))) {
-      newErrors.latitude = 'Latitude must be a number';
-    }
-
-    if (formData.longitude && isNaN(Number(formData.longitude))) {
-      newErrors.longitude = 'Longitude must be a number';
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -60,8 +52,10 @@ const VolunteerLogin: React.FC = () => {
     e.preventDefault();
 
     if (!validateForm()) {
+      console.log('not valid')
       return;
     }
+    console.log('valid')
 
     setIsLoading(true);
 
@@ -71,17 +65,14 @@ const VolunteerLogin: React.FC = () => {
         name: formData.name,
         school: formData.school || undefined,
         supervisorEmail: formData.supervisorEmail,
-        location: {
-          type: 'Point',
-          coordinates: [
-            formData.longitude ? parseFloat(formData.longitude) : 0,
-            formData.latitude ? parseFloat(formData.latitude) : 0
-          ]
-        }
+        city: formData.city,
+        country: formData.country,
       };
 
       // Make API call to backend
-      const response = await fetch('http://localhost:3000/volunteer/addVolunteer', {
+    //   const API_BASE = 'http://172.16.212.243';
+    //   const response = await fetch(`${API_BASE}/volunteer/addVolunteer`, {
+    const response = await fetch(`http://localhost:3000/volunteer/addVolunteer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -218,28 +209,26 @@ const VolunteerLogin: React.FC = () => {
                 </button>
                 
                 <div className="location-grid">
-                  <div className="form-group">
+                <div className="form-group">
                     <input
-                      type="text"
-                      name="latitude"
-                      value={formData.latitude}
-                      onChange={handleChange}
-                      placeholder="Latitude"
-                      className={`form-input ${errors.latitude ? 'error' : ''}`}
+                    type="text"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    placeholder="City"
+                    className="form-input"
                     />
-                    {errors.latitude && <span className="error-message">{errors.latitude}</span>}
-                  </div>
-                  <div className="form-group">
+                </div>
+                <div className="form-group">
                     <input
-                      type="text"
-                      name="longitude"
-                      value={formData.longitude}
-                      onChange={handleChange}
-                      placeholder="Longitude"
-                      className={`form-input ${errors.longitude ? 'error' : ''}`}
+                    type="text"
+                    name="country"
+                    value={formData.country}
+                    onChange={handleChange}
+                    placeholder="Country"
+                    className="form-input"
                     />
-                    {errors.longitude && <span className="error-message">{errors.longitude}</span>}
-                  </div>
+                </div>
                 </div>
               </div>
 
