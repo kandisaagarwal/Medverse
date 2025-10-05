@@ -132,28 +132,7 @@ useEffect(() => {
     }
   };
 
-const endConversation = async () => {
-  try {
-    const parsedAnswers = answers ? JSON.parse(answers as string) : {};
-    setMessages([]);
-    // Send demographics to server
-    await fetch('http://localhost:3000/reports/chat/end', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prefilledDemographics: {
-          age: parsedAnswers.age || '',
-          gender: parsedAnswers.gender || '',
-          country: parsedAnswers.country || '',
-          city: parsedAnswers.city || '',
-          email: parsedAnswers.email || ''
-        }
-      }),
-    });
-  } catch (error) {
-    console.error('Failed to end conversation on server:', error);
-  }
-};
+
   const renderItem = ({ item }: { item: Message }) => (
     <View
       style={[
@@ -183,11 +162,12 @@ const endConversation = async () => {
       />
 
       <View style={styles.inputContainer}>
-        {/* <Pressable onPress={endConversation} style={styles.endButton}>
-          <Text style={styles.endText}>End</Text>
-        </Pressable> */}
         <Pressable
-        onPress={() => router.push('/End')} // navigate to the end modal page
+        onPress={() =>
+          router.push({
+            pathname: './End',
+            params: { answers },
+          })}
         style={styles.endButton}
         >
         <Text style={styles.endText}>End</Text>
