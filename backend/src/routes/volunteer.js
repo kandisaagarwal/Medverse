@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Volunteer = require("../models/Volunteer")
+const Report = require("../models/Report")
 const { getLatLong } = require("../utils/geocode")
+const { sendHealthReportEmail } = require('../utils/sendUserEmail')
+const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
 
 router.post("/addVolunteer", async (req, res) => {
   try {
@@ -98,6 +101,7 @@ router.post("/getFirst", async (req, res) => {
 router.post("/report/:id/accept", async (req, res) => {
   try {
     //find report
+    console.log("Params:", req.params);
     const report = await Report.findById(req.params.id);
     if (!report) return res.status(404).json({ error: "Report not found" });
 
@@ -119,7 +123,7 @@ router.post("/report/:id/accept", async (req, res) => {
       textY -= lineHeight;
     };
 
-    addLine("🩺 Medverse Health Report Summary");
+    addLine("Medverse Health Report Summary");
     addLine(`Report ID: ${report._id}`);
     addLine(`Date: ${new Date().toLocaleString()}`);
     addLine("");
@@ -135,24 +139,16 @@ router.post("/report/:id/accept", async (req, res) => {
     report.recommendedActions.forEach((a, i) => addLine(`${i + 1}. ${a}`));
 
     const pdfBytes = await pdfDoc.save();
+    const base64Pdf = Buffer.from(pdfBytes).toString("base64");
 
-    //send email:
-    await resend.emails.send({
-      from: "Medverse <noreply@medverse.com>",
-      to: report.email,
-      subject: "Your Medverse Health Report",
-      text: "Please find attached your health report summary.",
-      attachments: [
-        {
-          filename: "Medverse_Report.pdf",
-          content: pdfBytes.toString("base64"),
-        },
-      ],
+      // 4️⃣ Send email using your helper
+    await sendHealthReportEmail(report, base64Pdf);
+
+      // 5️⃣ Respond
+    res.status(200).json({
+      message: "Report marked complete and emailed to patient.",
+      report,
     });
-
-
-    res.status(200).json({ message: "Report marked complete and emailed to patient.", report });
-
 
   } catch (err) {
     console.error(err);

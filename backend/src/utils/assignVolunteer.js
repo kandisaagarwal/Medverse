@@ -18,12 +18,13 @@ async function assignVolunteer(reportId) {
 
     // Find nearest volunteer sorted by distance and then by currentQueue
     const volunteers = await Volunteer.find({
-      status: "pending" // consider only pending volunteers
+      location: {
+        $near: {
+          $geometry: { type: "Point", coordinates: report.location.coordinates }
+        }
+      }
     })
-      .where('location').near({ 
-        center: { type: "Point", coordinates: report.location.coordinates } 
-      })
-      .sort({ currentQueue: 1 })  // prioritize volunteers with fewer assigned reports
+      .sort({ currentQueue: 1 }) // prioritize volunteers with fewer assigned reports
       .limit(10);
 
     if (!volunteers || volunteers.length === 0) {

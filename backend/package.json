@@ -29,6 +29,7 @@
     "mongoose": "^8.19.0",
     "node-fetch": "^3.3.2",
     "openai": "^6.1.0",
+    "pdf-lib": "^1.17.1",
     "resend": "^6.1.2"
   },
   "devDependencies": {
