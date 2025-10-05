@@ -1,24 +1,35 @@
 // app/Patient.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Pressable, Dimensions, Platform, ScrollView } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Pressable, Dimensions, ScrollView } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useRouter } from 'expo-router';
 
+const genderOptions = [
+  { label: 'Male', value: 'Male' },
+  { label: 'Female', value: 'Female' },
+  { label: 'Non-binary', value: 'Non-binary' },
+  { label: 'Genderqueer', value: 'Genderqueer' },
+  { label: 'Genderfluid', value: 'Genderfluid' },
+  { label: 'Agender', value: 'Agender' },
+  { label: 'Two-Spirit', value: 'Two-Spirit' },
+  { label: 'Bigender', value: 'Bigender' },
+  { label: 'Demiboy', value: 'Demiboy' },
+  { label: 'Demigirl', value: 'Demigirl' },
+  { label: 'Other', value: 'Other' },
+];
+
 const questions = [
   { key: 'email', type: 'input', question: 'What is your email?', placeholder: 'Enter your email', keyboardType: 'email-address' },
-  { key: 'gender', type: 'picker', question: 'What is your gender?', options: [
-    { label: 'Male', value: 'Male' },
-    { label: 'Female', value: 'Female' },
-    { label: 'Other', value: 'Other' },
-  ] },
+  { key: 'gender', type: 'picker', question: 'What is your gender?', options: genderOptions },
   { key: 'age', type: 'input', question: 'How old are you?', placeholder: 'Enter your age', keyboardType: 'numeric' },
+  { key: 'city', type: 'input', question: 'What city are you in?', placeholder: 'Enter your city', keyboardType: 'default' },
+  { key: 'country', type: 'input', question: 'What country are you in?', placeholder: 'Enter your country', keyboardType: 'default' },
 ];
 
 const Patient: React.FC = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState({ email: '', gender: '', age: '' });
-
+  const [answers, setAnswers] = useState({ email: '', gender: '', age: '', city: '', country: '', genderOther: '' });
   const [open, setOpen] = useState(false);
   const [genderValue, setGenderValue] = useState<string | null>(null);
 
@@ -27,7 +38,7 @@ const Patient: React.FC = () => {
       setCurrentStep(currentStep + 1);
     } else {
       console.log('User Answers:', answers);
-      router.push('./(tabs)/Home');
+      router.push('./Volunteer');
     }
   };
 
@@ -47,7 +58,6 @@ const Patient: React.FC = () => {
         </View>
       </View>
 
-      {/* Fixed-position Question Area */}
       <View style={styles.fixedContent}>
         <Text style={styles.question}>{questions[currentStep].question}</Text>
 
@@ -55,7 +65,11 @@ const Patient: React.FC = () => {
           <TextInput
             style={styles.input}
             placeholder={questions[currentStep].placeholder}
-            keyboardType={questions[currentStep].keyboardType === 'numeric' ? 'default' : questions[currentStep].keyboardType as any}
+            keyboardType={
+              questions[currentStep].keyboardType === 'numeric'
+                ? 'numeric'
+                : (questions[currentStep].keyboardType as any)
+            }
             value={answers[questions[currentStep].key as keyof typeof answers]}
             onChangeText={(text) => {
               if (questions[currentStep].key === 'age') handleChange(text.replace(/[^0-9]/g, ''));
@@ -66,23 +80,34 @@ const Patient: React.FC = () => {
             onSubmitEditing={handleNext}
           />
         ) : (
-          <DropDownPicker
-            open={open}
-            value={genderValue || answers.gender}
-            items={questions[currentStep].options!}
-            setOpen={setOpen}
-            setValue={(callbackOrValue: string | ((prev: string | null) => string)) => {
-              const value = typeof callbackOrValue === 'function' ? callbackOrValue(genderValue) : callbackOrValue;
-              setGenderValue(value);
-              handleChange(value as string);
-            }}
-            placeholder="Select your gender"
-            style={styles.dropdown}
-            dropDownContainerStyle={styles.dropdownContainer}
-          />
+          <>
+            <DropDownPicker
+              open={open}
+              value={genderValue || answers.gender}
+              items={questions[currentStep].options!}
+              setOpen={setOpen}
+              setValue={(callbackOrValue: string | ((prev: string | null) => string)) => {
+                const value = typeof callbackOrValue === 'function' ? callbackOrValue(genderValue) : callbackOrValue;
+                setGenderValue(value);
+                handleChange(value as string);
+              }}
+              placeholder="Select your gender"
+              style={styles.dropdown}
+              dropDownContainerStyle={styles.dropdownContainer}
+            />
+
+            {/* Show text input if user selects "Other" */}
+            {genderValue === 'Other' && (
+              <TextInput
+                style={styles.input}
+                placeholder="Please specify"
+                value={answers.genderOther}
+                onChangeText={(text) => setAnswers({ ...answers, genderOther: text })}
+              />
+            )}
+          </>
         )}
 
-        {/* Button always in the same position */}
         <Pressable style={styles.button} onPress={handleNext}>
           <Text style={styles.buttonText}>{currentStep < questions.length - 1 ? 'Next' : 'Submit'}</Text>
         </Pressable>
