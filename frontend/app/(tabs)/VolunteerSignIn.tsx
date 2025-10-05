@@ -188,7 +188,7 @@ const VolunteerSignIn: React.FC = () => {
       
       try {
         // Make API call to backend for sign in
-        const response = await fetch(`http://localhost:3000/volunteer/signin`, {
+        const response = await fetch(`http://localhost:3000/volunteer/isValid`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
