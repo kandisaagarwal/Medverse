@@ -81,7 +81,7 @@ router.post("/getFirst", async (req, res) => {
     // Find the oldest report assigned to this volunteer that is still pending
     const report = await Report.findOne({
       assigned_volunteer: volunteer_id,
-      status: "pending"  // only get reports not yet processed
+      status: "assigned"  // only get reports not yet processed
     })
     .sort({ createdAt: 1 }); // oldest first
 

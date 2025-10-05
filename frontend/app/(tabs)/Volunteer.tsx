@@ -221,6 +221,7 @@ const Volunteer: React.FC = () => {
       }
       
       const data = await response.json();
+      console.log('Backend response:', data);
       
       // Transform the backend data to match your frontend interface
       if (data.report) {
