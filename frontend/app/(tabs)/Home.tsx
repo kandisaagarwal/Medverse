@@ -79,6 +79,7 @@ const Home: React.FC = () => {
             </button>
 
 
+
             {/* Supervisor Portal */}
             <button 
               className="portal-card supervisor-portal"
@@ -126,7 +127,7 @@ const Home: React.FC = () => {
           </div>
           
           <div className="footer-bottom">
-            <p>⚠️ For emergencies, call 911, 999, or 112 immediately</p>
+            <p>⚠ For emergencies, call 911, 999, or 112 immediately</p>
             <p className="footer-copyright">© 2024 Medverse. All rights reserved.</p>
           </div>
         </footer>

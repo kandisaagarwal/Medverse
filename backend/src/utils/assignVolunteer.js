@@ -18,10 +18,14 @@ async function assignVolunteer(reportId) {
 
     // Find nearest volunteer sorted by distance and then by currentQueue
     const volunteers = await Volunteer.find({
-      location: { $near: { $geometry: report.location } }
+      location: {
+        $near: {
+          $geometry: { type: "Point", coordinates: report.location.coordinates }
+        }
+      }
     })
-      .sort({ currentQueue: 1 })  // prioritize volunteers with fewer assigned reports
-      .limit(10);                  // optional: limit to top 10 nearest volunteers
+      .sort({ currentQueue: 1 }) // prioritize volunteers with fewer assigned reports
+      .limit(10);
 
     if (!volunteers || volunteers.length === 0) {
       console.warn("No available volunteers found.");
@@ -30,8 +34,9 @@ async function assignVolunteer(reportId) {
 
     const selectedVolunteer = volunteers[0];
 
-    // Update report with assigned volunteer
+    // Update report with assigned volunteer and set report status
     report.assigned_volunteer = selectedVolunteer._id;
+    report.status = "assigned";       // <--- set report status here
     await report.save();
 
     // Increment volunteer's currentQueue
