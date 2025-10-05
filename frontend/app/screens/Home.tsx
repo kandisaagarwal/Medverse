@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles/home.css';  // Add this line at the top
 import { Globe, Users, Shield, Stethoscope, UserCog, ShieldCheck, AlertTriangle } from 'lucide-react';
 
 interface HomeProps {
