@@ -295,12 +295,12 @@ const Volunteer: React.FC = () => {
     <ParallaxScrollView
       headerImage={
         <div className="parallax-header">
-          <div className="header-gradient">
-            <ClipboardList size={80} color="white" style={{ opacity: 0.9 }} />
+          <div className="header-gradient" ref={el => el?.style.setProperty("visibility", "visible", "important")}>
+            <ClipboardList size={80} color="white" style={{ opacity: 0.9 }} className='clipboard'/>
           </div>
         </div>
       }
-      headerBackgroundColor={{ light: 'transparent', dark: 'transparent' }}
+      headerBackgroundColor={{ light: '#90ee90', dark: '#64e764' }}
     >
       <div className="volunteer-container">
         <div className="content-wrapper">

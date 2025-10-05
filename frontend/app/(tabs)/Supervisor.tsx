@@ -76,7 +76,7 @@ const Supervisor: React.FC = () => {
       headerImage={
         <div className="parallax-header">
           <div className="header-gradient">
-            <ShieldCheck size={80} color="white" style={{ opacity: 0.9 }} />
+            <ShieldCheck size={80} color="white" style={{ opacity: 0.9 }} className='shield'/>
           </div>
         </div>
       }
