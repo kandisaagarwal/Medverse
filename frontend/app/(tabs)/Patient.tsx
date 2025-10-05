@@ -15,7 +15,7 @@ const genderOptions = [
   { label: 'Bigender', value: 'Bigender' },
   { label: 'Demiboy', value: 'Demiboy' },
   { label: 'Demigirl', value: 'Demigirl' },
-  { label: 'Other', value: 'Other' },
+  { label: 'Prefer not to say', value: 'Prefer not to say' },
 ];
 
 const questions = [
@@ -29,7 +29,7 @@ const questions = [
 const Patient: React.FC = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState({ email: '', gender: '', age: '', city: '', country: '', genderOther: '' });
+  const [answers, setAnswers] = useState({ email: '', gender: '', age: '', city: '', country: ''});
   const [open, setOpen] = useState(false);
   const [genderValue, setGenderValue] = useState<string | null>(null);
 
@@ -37,8 +37,9 @@ const Patient: React.FC = () => {
     if (currentStep < questions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      console.log('User Answers:', answers);
-      router.push('./Volunteer');
+      const answersJSON = JSON.stringify(answers);
+      console.log(answersJSON);
+      router.push('./Chat');
     }
   };
 
@@ -95,16 +96,6 @@ const Patient: React.FC = () => {
               style={styles.dropdown}
               dropDownContainerStyle={styles.dropdownContainer}
             />
-
-            {/* Show text input if user selects "Other" */}
-            {genderValue === 'Other' && (
-              <TextInput
-                style={styles.input}
-                placeholder="Please specify"
-                value={answers.genderOther}
-                onChangeText={(text) => setAnswers({ ...answers, genderOther: text })}
-              />
-            )}
           </>
         )}
 
