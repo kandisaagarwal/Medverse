@@ -175,7 +175,12 @@ const VolunteerLogin: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Login failed');
+        // parse the body as JSON
+        const errorData = await response.json();
+        console.error(errorData.error);
+      } else {
+        const data = await response.json();
+        console.log(data);
       }
 
       const data = await response.json();
