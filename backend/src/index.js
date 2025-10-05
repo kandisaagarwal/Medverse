@@ -1,20 +1,21 @@
+// backend/src/index.js
+const dotenv = require("dotenv");
 const express = require("express");
 
-const app = express();
+dotenv.config();
 
-//import routes
-const reports = require('./routes/report.js')
+const app = express();
+app.use(express.json());
+
+// import routes
+const reports = require('./routes/report.js');
 
 app.use('/reports', reports);
 
+// keep .env port as first option, fallback to 3000
+const PORT = process.env.PORT || 3000;
 
-// keep .env port as the first option and if it fails go with 3000
-PORT = process.env.PORT || 3000;
-
-//start listening
+// start listening
 app.listen(PORT, () => {
-		console.log("App available on port http:://localhost:$PORT");
-    })
-
-
-
+  console.log(`App available on http://localhost:${PORT}`);
+});
