@@ -47,16 +47,68 @@ const VolunteerReview: React.FC = () => {
     }
   };
 
-  const handleAccept = () => {
+const handleAccept = async () => {
+  if (!selectedCase) return;
+
+  try {
+    const response = await fetch(`http://localhost:3000/volunteer/report/${selectedCase.id}/accept`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // If your backend needs a body, you can add it here
+      // body: JSON.stringify({ ... })
+    });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.error || 'Failed to accept report');
+    }
+
+    const data = await response.json();
+    console.log('Report accepted:', data);
+
     alert('Case approved and sent to patient!');
     router.back();
-  };
+  } catch (err: any) {
+    console.error('Error accepting report:', err);
+    alert(`Failed to accept report: ${err.message}`);
+  }
+}
 
-  const handleAskQuestion = () => {
+  const handleAskQuestion = async () => {
+    if (!selectedCase) return;
+
     if (questionText.trim()) {
       alert(`Question sent to patient: ${questionText}`);
       setQuestionText('');
     }
+
+    try {
+    const response = await fetch(`http://localhost:3000/volunteer/report/${selectedCase.id}/followUp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // If your backend needs a body, you can add it here
+      // body: JSON.stringify({ ... })
+    });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.error || 'Failed to send follow up');
+    }
+
+    const data = await response.json();
+    console.log('Follow up sent:', data);
+
+    alert('Follow up sent to the assistant!');
+    router.back();
+  } catch (err: any) {
+    console.error('Error adding folllow up to report:', err);
+    alert(`Failed to add follow up to report: ${err.message}`);
+  }
+
   };
 
   const handlePrescribe = () => {

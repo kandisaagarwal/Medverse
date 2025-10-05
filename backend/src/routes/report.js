@@ -161,6 +161,10 @@
         };
 
 
+        if (report.severity == "HIGH"){
+          return res.status(500).json("Too high risk. Please consult a professional near you")
+        }
+
         //send to the database
         try {
           const savedReport = await Report.create(report); // stores report in MongoDB
