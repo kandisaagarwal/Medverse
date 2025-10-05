@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import '../styles/volunteer-login.css';
-import { UserCog, Mail, Building2, MapPin, LogIn, ChevronDown, User } from 'lucide-react';
+import { UserCog, Mail, Building2, MapPin, LogIn, ChevronDown, User, Lock } from 'lucide-react';
 import { router } from 'expo-router';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 
@@ -76,6 +76,7 @@ const VolunteerLogin: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    password: '',
     school: '',
     supervisorEmail: '',
     city: '',
@@ -99,7 +100,6 @@ const VolunteerLogin: React.FC = () => {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -111,9 +111,7 @@ const VolunteerLogin: React.FC = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    }
+    if (!formData.name.trim()) newErrors.name = 'Name is required';
 
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
@@ -121,9 +119,13 @@ const VolunteerLogin: React.FC = () => {
       newErrors.email = 'Invalid email format';
     }
 
-    if (!formData.school.trim()) {
-      newErrors.school = 'Medical school is required';
+    if (!formData.password.trim()) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
     }
+
+    if (!formData.school.trim()) newErrors.school = 'Medical school is required';
 
     if (!formData.supervisorEmail.trim()) {
       newErrors.supervisorEmail = 'Supervisor email is required';
@@ -131,13 +133,8 @@ const VolunteerLogin: React.FC = () => {
       newErrors.supervisorEmail = 'Invalid email format';
     }
 
-    if (!formData.city.trim()) {
-      newErrors.city = 'City is required';
-    }
-
-    if (!formData.country.trim()) {
-      newErrors.country = 'Country is required';
-    }
+    if (!formData.city.trim()) newErrors.city = 'City is required';
+    if (!formData.country.trim()) newErrors.country = 'Country is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -155,39 +152,25 @@ const VolunteerLogin: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Prepare data for backend
-      const volunteerData = {
-        name: formData.name,
-        email: formData.email,
-        school: formData.school,
-        supervisorEmail: formData.supervisorEmail,
-        city: formData.city,
-        country: formData.country,
-      };
+      const volunteerData = { ...formData };
 
-      // Make API call to backend
       const response = await fetch(`http://localhost:3000/volunteer/addVolunteer`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(volunteerData)
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        // parse the body as JSON
-        const errorData = await response.json();
-        console.error(errorData.error);
-      } else {
-        const data = await response.json();
-        console.log(data);
+        console.error(data.error || "Error from backend");
+        alert(data.error || "Failed to register volunteer");
+        return;
       }
 
-      const data = await response.json();
-      
-      // Navigate to volunteer page
+      console.log("Volunteer added:", data);
       router.push('/(tabs)/Volunteer');
-      
+
     } catch (error) {
       console.error('Login error:', error);
       alert('Login failed. Please try again.');
@@ -257,7 +240,24 @@ const VolunteerLogin: React.FC = () => {
                 {errors.email && <span className="error-message">{errors.email}</span>}
               </div>
 
-              {/* School Field - Custom Dropdown */}
+              {/* Password Field */}
+              <div className="form-group">
+                <label className="form-label">
+                  <Lock size={18} />
+                  Password *
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter a password"
+                  className={`form-input ${errors.password ? 'error' : ''}`}
+                />
+                {errors.password && <span className="error-message">{errors.password}</span>}
+              </div>
+
+              {/* School Field */}
               <div className="form-group">
                 <label className="form-label">
                   <Building2 size={18} />
@@ -296,7 +296,6 @@ const VolunteerLogin: React.FC = () => {
                   <MapPin size={18} />
                   Location *
                 </label>
-                
                 <div className="location-grid">
                   <div className="form-group">
                     <input
@@ -323,18 +322,11 @@ const VolunteerLogin: React.FC = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="submit-button"
-              >
-                {isLoading ? (
-                  'Logging in...'
-                ) : (
+              <button type="submit" disabled={isLoading} className="submit-button">
+                {isLoading ? 'Registering...' : (
                   <>
                     <LogIn size={20} />
-                    Login & Access Cases
+                    Register & Access Cases
                   </>
                 )}
               </button>
