@@ -43,7 +43,6 @@ const Patient: React.FC = () => {
       pathname: './Chat',
       params: { answers: JSON.stringify(answers) },
     });
-
     }
   };
 

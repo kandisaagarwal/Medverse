@@ -10,7 +10,7 @@ const Home: React.FC = () => {
       headerImage={
         <div className="parallax-header">
           <div className="header-gradient">
-            <Stethoscope size={100} color="white" style={{ opacity: 0.9 }} />
+            <Stethoscope size={100} color="white" style={{ opacity: 0.9 }} className='stethoscope'/>
           </div>
         </div>
       }
@@ -22,8 +22,8 @@ const Home: React.FC = () => {
           <div className="hero-content">
             
             <h1 className="hero-title">
-              Mediverse<br />
-              <span className="gradient-text">Redefined</span>
+              MediVerse<br />
+              <span className="gradient-text">Healthcare Redefined</span>
             </h1>
             
             <p className="hero-description">
