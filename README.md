@@ -1,50 +1,184 @@
-# Welcome to your Expo app 👋
+# MedVerse – Anonymous AI-Powered Preliminary Medical Advice
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+![Project Status](https://img.shields.io/badge/status-in%20development-orange)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Frontend](https://img.shields.io/badge/frontend-React%20Native-61DAFB)
+![Backend](https://img.shields.io/badge/backend-Node.js%20%7C%20Express-339933)
+![Database](https://img.shields.io/badge/database-MongoDB-47A248)
+![AI Models](https://img.shields.io/badge/AI-Gemini%20%7C%20HuggingFace-7B1FA2)
 
-## Get started
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Motivation & Impact](#motivation--impact)
+- [Target Users](#target-users)
+- [Core Features](#core-features)
+  - [User Side](#user-side)
+  - [Volunteer-Medical Student Side](#volunteer-medical-student-side)
+  - [Supervisor Side](#supervisor-side)
+  - [Report Delivery](#report-delivery)
+- [Tech Stack](#tech-stack)
+- [Installation & Running the App](#installation--running-the-app)
+- [Startup Potential](#startup-potential)
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## Project Overview
 
-2. Start the app
+**MedVerse** is a privacy-first medical consultation platform that leverages AI and a network of dedicated medical student volunteers to provide preliminary diagnoses and essential guidance. Our mission is to serve users in regions with limited access to healthcare, offering a vital first point of contact for medical concerns.
 
-   ```bash
-   npx expo start
-   ```
+Users can securely describe their symptoms, upload optional images, and provide minimal demographic information (age, gender, location, phone number) without revealing their name or financial details. An intelligent AI model structures this input into a comprehensive report and performs an initial assessment of the problem's severity.
 
-In the output, you'll find options to open the app in a
+- **Low to Medium Severity Cases:** These are thoughtfully routed to verified medical students for thorough review, ensuring accuracy and actionable guidance.
+- **Critical Cases:** High-severity issues are automatically flagged and users are immediately advised to seek emergency care at the nearest medical facility.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Motivation & Impact
 
-## Get a fresh project
+MedVerse is driven by a commitment to bridge healthcare gaps and empower individuals with timely, reliable preliminary medical advice.
 
-When you're ready, run:
+-   **Accessibility:** Provides crucial preliminary medical guidance to underpriveledged people with free access to healthcare and in underserved areas facing doctor shortages or limited healthcare infrastructure.
+-   **Privacy:** Users remain completely anonymous; no personal identifying information or financial details are ever required, fostering trust and encouraging use.
+-   **Efficiency:** AI-assisted report generation significantly reduces the workload for volunteer medical students and streamlines the preliminary diagnosis process, allowing them to focus on critical analysis.
+-   **Educational Engagement:** Offers medical students invaluable, supervised real-world experience, enhancing their diagnostic skills and clinical reasoning.
+-   **Data-Driven Insights:** All collected data is anonymized and can be leveraged to continuously improve AI models, leading to better predictions and more effective healthcare support in the future.
 
-```bash
-npm run reset-project
-```
+### Target Users:
+-   Individuals residing in underserved areas with limited access to healthcare professionals.
+-   Medical schools seeking innovative platforms to engage their students in supervised practical learning and contribute to community health.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## Core Features
 
-To learn more about developing your project with Expo, look at the following resources:
+Medverse is designed with distinct functionalities for its diverse user base:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### User Side:
+-   **Intuitive Chat Interface:** Allows users to easily describe their symptoms in natural language.
+-   **Optional Image Uploads:** Users can upload relevant images to provide visual context for their conditions, aiding in more accurate preliminary assessments.
+-   **AI-Driven Structured Report Generation:** Our AI model processes user input, structuring it into a clear, concise report, and intelligently prompts for any missing crucial details.
+-   **Automatic Severity Assessment:** The AI instantly classifies cases into:
+    -   **Low/Medium Severity:** Routed for review by medical student volunteers.
+    -   **High Severity:** Users are immediately advised to visit their nearest Emergency Room or medical facility.
 
-## Join the community
+### Volunteer (Medical Student) Side:
+-   **Structured AI-Generated Report Review:** Volunteers receive clear, concise reports generated by the AI for efficient review.
+-   **Actionable Options:**
+    -   **Approve AI Report:** If satisfied with the AI's assessment and suggestions.
+    -   **Ask Follow-up Questions:** Triggers the AI to generate targeted questions for the user to gather more information.
+    -   **Recommend Over-the-Counter (OTC) Prescriptions:** Requires explicit supervisor approval before being sent to the user.
+    -   **Mark Cases as Out-of-Scope:** For conditions that require in-person consultation or specialized care, alerting the user to seek local professional help.
 
-Join our community of developers creating universal apps.
+### Supervisor Side:
+-   **OTC Prescription Approval:** Oversees and approves all OTC medication recommendations made by volunteers.
+-   **Volunteer Activity Monitoring:** Tracks volunteer engagement and performance to ensure quality and adherence to guidelines.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### Report Delivery:
+-   Users receive their finalized preliminary medical report and guidance securely via their provided email or phone number.
+
+---
+
+## Tech Stack
+
+MedAssist is built using a modern, scalable, and robust technology stack:
+
+-   **Frontend (User & Volunteer):** [React Native](https://reactnative.dev/) – For cross-platform mobile application development, ensuring a consistent experience on iOS and Android.
+-   **Backend:** [Node.js](https://nodejs.org/) with [Express](https://expressjs.com/) – Provides a fast, scalable, and efficient server-side environment.
+-   **Database:** [MongoDB](https://www.mongodb.com/) – A NoSQL database ideal for storing flexible structured reports, user metadata (anonymized), and volunteer assignments.
+-   **AI Models:**
+    -   **LLM (e.g., Google Gemini):** Used for advanced natural language understanding, structuring user input into detailed medical reports, engaging in conversational follow-up prompts, and initial severity assessment.
+    -   **DXGPT:** Integrated for more specialized medical reasoning and suggesting likely conditions based on structured data.
+-   **Authentication:** Custom system for Medical Student ID verification during volunteer signup, ensuring all volunteers are legitimate.
+-   **Notifications:** [Email Delivery Service] using Sengrid for securely sending finalized reports and prescription notifications to users.
+
+---
+
+## Installation & Running the App
+
+To get MedAssist up and running on your local machine, follow these steps:
+
+### Prerequisites:
+-   [Node.js](https://nodejs.org/en/download/) (v18 or higher recommended)
+-   [npm](https://www.npmjs.com/get-npm) (usually comes with Node.js)
+-   [Expo CLI](https://docs.expo.dev/get-started/installation/) for React Native development
+-   [MongoDB](https://www.mongodb.com/try/download/community) installed locally or a cloud-hosted MongoDB Atlas instance.
+
+### Steps:
+
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/yourusername/medassist.git
+    cd medassist
+    ```
+
+2.  **Install Backend Dependencies:**
+    Navigate into the `backend` directory and install required packages:
+    ```bash
+    cd backend
+    npm install
+    ```
+
+3.  **Configure Backend Environment Variables:**
+    Create a `.env` file in the `backend` directory and populate it with your API keys and configuration:
+    ```
+    # --- Backend Configuration ---
+    PORT=3000
+    MONGO_URI="mongodb://localhost:27017/medverse" # Or your MongoDB Atlas connection string
+    SESSION_SECRET="YOUR_VERY_LONG_AND_RANDOM_SESSION_SECRET_STRING" # MUST BE UNIQUE & SECURE!
+
+    # --- AI Model APIs ---
+    GEMINI_API_KEY="YOUR_GOOGLE_GEMINI_API_KEY"
+    DXGPT_API_ENDPOINT="http://localhost:5001/diagnose" # Replace with your DXGPT endpoint if separate, or adapt for Hugging Face
+
+    # --- Notification Services ---
+    EMAIL_SERVICE_API_KEY="YOUR_EMAIL_SERVICE_API_KEY"
+    EMAIL_FROM_ADDRESS="no-reply@medassist.com"
+    ```
+
+4.  **Install Frontend Dependencies:**
+    Navigate into the `frontend` directory and install required packages:
+    ```bash
+    cd ../frontend
+    npm install
+    ```
+
+6.  **Run the Backend Server:**
+    From the `backend` directory:
+    ```bash
+    npm start
+    ```
+    The backend server should start on `http://localhost:3000`.
+
+7.  **Run the React Native App:**
+    From the `frontend` directory:
+    ```bash
+    npx expo start
+    ```
+    This will open the Expo Dev Tools in your browser. You can then:
+    *   Scan the QR code with your phone (using the Expo Go app).
+    *   Run on an Android emulator (`a`).
+    *   Run on an iOS simulator (`i`).
+
+    Open the app on your simulator or device, and start testing!
+
+---
+
+## Startup Potential
+
+Medverse has significant potential to evolve beyond a hackathon project into a sustainable, impactful platform, particularly through a **subscription-based model for medical schools**:
+
+**Revenue Model:**
+-   Schools subscribe to Merverse on a per-semester or per-year basis to provide their medical students with access to our platform.
+
+**Benefits for Subscribing Schools:**
+-   **Structured, Supervised Practical Learning:** Offers an invaluable opportunity for students to apply theoretical knowledge in a supervised, real-world context, enhancing their diagnostic and patient communication skills.
+-   **Data-Driven Insights for Medical Education:** Anonymized aggregate data can provide insights into common health concerns in underserved regions, informing curriculum development and public health initiatives.
+-   **Contribution to Global Healthcare Outreach:** Enables schools to fulfill their social responsibility by contributing to preliminary healthcare access in underserved communities.
+
+### Future Opportunities:
+
+-   **Integration with National Health Databases:** Secure and anonymized integration with health databases could provide richer context for AI models and volunteers, respecting all privacy regulations.
+-   **Expanded AI Capabilities:** Further development of AI models for specialized conditions (e.g., advanced dermatological analysis, pediatric assessments) to broaden the platform's utility.
+-   **Multilingual Support:** Implementing comprehensive multilingual capabilities to enable global deployment and reach an even wider user base.
+-   **Telemedicine Integration:** Seamless integration with established telemedicine platforms for easy transition of critical or complex cases to licensed physicians.
+-   **Partnerships with NGOs:** Collaborating with non-governmental organizations to expand reach and impact in specific humanitarian contexts.
