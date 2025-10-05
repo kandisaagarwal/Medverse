@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import '../styles/volunteer-login.css';
-import { UserCog, Mail, Building2, MapPin, LogIn, ChevronDown } from 'lucide-react';
+import { UserCog, Mail, Building2, MapPin, LogIn, ChevronDown, User } from 'lucide-react';
 import { router } from 'expo-router';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 
@@ -75,6 +75,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ value, onChange, option
 const VolunteerLogin: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
     school: '',
     supervisorEmail: '',
     city: '',
@@ -114,6 +115,12 @@ const VolunteerLogin: React.FC = () => {
       newErrors.name = 'Name is required';
     }
 
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Invalid email format';
+    }
+
     if (!formData.school.trim()) {
       newErrors.school = 'Medical school is required';
     }
@@ -151,6 +158,7 @@ const VolunteerLogin: React.FC = () => {
       // Prepare data for backend
       const volunteerData = {
         name: formData.name,
+        email: formData.email,
         school: formData.school,
         supervisorEmail: formData.supervisorEmail,
         city: formData.city,
@@ -205,7 +213,7 @@ const VolunteerLogin: React.FC = () => {
               <div className="icon-circle green">
                 <UserCog size={32} />
               </div>
-              <h2 className="login-title">Volunteer Login</h2>
+              <h2 className="login-title">Volunteer Sign-Up</h2>
               <p className="login-subtitle">Enter your details to access the case queue</p>
             </div>
 
@@ -213,7 +221,7 @@ const VolunteerLogin: React.FC = () => {
               {/* Name Field */}
               <div className="form-group">
                 <label className="form-label">
-                  <UserCog size={18} />
+                  <User size={18} />
                   Full Name *
                 </label>
                 <input
@@ -225,6 +233,23 @@ const VolunteerLogin: React.FC = () => {
                   className={`form-input ${errors.name ? 'error' : ''}`}
                 />
                 {errors.name && <span className="error-message">{errors.name}</span>}
+              </div>
+
+              {/* Email Field */}
+              <div className="form-group">
+                <label className="form-label">
+                  <Mail size={18} />
+                  Your Email *
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="your.email@example.com"
+                  className={`form-input ${errors.email ? 'error' : ''}`}
+                />
+                {errors.email && <span className="error-message">{errors.email}</span>}
               </div>
 
               {/* School Field - Custom Dropdown */}
