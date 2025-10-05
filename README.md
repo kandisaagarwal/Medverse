@@ -1,11 +1,5 @@
 # MedVerse – Anonymous AI-Powered Preliminary Medical Advice
 
-![Project Status](https://img.shields.io/badge/status-in%20development-orange)
-![Frontend](https://img.shields.io/badge/frontend-React%20Native-61DAFB)
-![Backend](https://img.shields.io/badge/backend-Node.js%20%7C%20Express-339933)
-![Database](https://img.shields.io/badge/database-MongoDB-47A248)
-![AI Models](https://img.shields.io/badge/AI-Gemini%20%7C%20HuggingFace-7B1FA2)
-
 ## Table of Contents
 - [Project Overview](#project-overview)
 - [Motivation & Impact](#motivation--impact)
