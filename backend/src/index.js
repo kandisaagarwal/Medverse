@@ -15,8 +15,11 @@ mongoose.connect(process.env.MONGO_URI)
 
 // import routes
 const reports = require('./routes/report.js');
+const volunteers = require('./routes/volunteer.js')
 
 app.use('/reports', reports);
+
+app.use('/volunteer', volunteers)
 
 // keep .env port as first option, fallback to 3000
 const PORT = process.env.PORT || 3000;
