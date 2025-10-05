@@ -28,7 +28,8 @@
     "mongodb": "^6.20.0",
     "mongoose": "^8.19.0",
     "node-fetch": "^3.3.2",
-    "openai": "^6.1.0"
+    "openai": "^6.1.0",
+    "resend": "^6.1.2"
   },
   "devDependencies": {
     "@gradio/client": "^1.19.1"

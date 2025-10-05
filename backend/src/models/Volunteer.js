@@ -2,6 +2,8 @@
 const mongoose = require("mongoose");
 
 const volunteerSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true }, // used as username
+  password: { type: String, required: true },            // new field
   name: { type: String, required: true },
   school: { type: String },
   supervisorEmail: { type: String },
@@ -10,7 +12,8 @@ const volunteerSchema = new mongoose.Schema({
   location: {
     type: { type: String, enum: ['Point'], default: 'Point' },
     coordinates: { type: [Number], default: [0, 0] } // [longitude, latitude]
-  }
+  },
+  status: { type: String, enum: ['pending', 'active', 'inactive'], default: 'pending' }
 }, { timestamps: true });
 
 // 2dsphere index for geospatial queries
