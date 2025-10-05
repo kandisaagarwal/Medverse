@@ -199,24 +199,22 @@ const Volunteer: React.FC = () => {
   const [volunteerId, setVolunteerId] = useState<string | null>(null);
 
   // Fetch cases from backend API
-  const fetchCases = async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      
-      // For now, we'll use a demo volunteer ID since we don't have authentication set up
-      // In a real app, you'd get this from login/session
-      const demoVolunteerId = '68e243e34bbacf29c6509379'; // Replace with actual volunteer ID from login
-      
-      const response = await fetch('http://localhost:3000/volunteer/getFirst', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          volunteer_id: demoVolunteerId
-        })
-      });
+    const fetchCases = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const demoVolunteerId = '68e243e34bbacf29c6509379';
+        
+        const response = await fetch('http://localhost:3000/volunteer/getFirst', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            volunteer_id: demoVolunteerId
+          })
+        });
       
       if (!response.ok) {
         throw new Error('Failed to fetch cases');
@@ -268,6 +266,35 @@ const Volunteer: React.FC = () => {
       setIsLoading(false);
     }
   };
+  // Temporary test function - add this before your useEffect
+const testBackendConnection = async () => {
+  try {
+    console.log('🧪 Testing backend connection...');
+    
+    // Test 1: Simple GET request to test route
+    const testResponse = await fetch('http://localhost:3000/volunteer/test');
+    const testData = await testResponse.json();
+    console.log('✅ Backend test route works:', testData);
+    
+    return true;
+  } catch (error) {
+    console.error('❌ Backend connection test failed:', error);
+    return false;
+  }
+};
+
+useEffect(() => {
+  // Test connection first, then fetch cases
+  testBackendConnection().then(success => {
+    if (success) {
+      console.log('🎉 Backend connection successful, fetching cases...');
+      fetchCases();
+    } else {
+      console.log('💥 Backend connection failed');
+      // You could set fallback data here immediately
+    }
+  });
+}, []);
 
   useEffect(() => {
     fetchCases();
