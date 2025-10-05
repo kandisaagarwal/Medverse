@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import '../styles/volunteer.css';
-import { ClipboardList, User, MapPin, Calendar, AlertCircle, CheckCircle, MessageSquare, FileText, X } from 'lucide-react';
+import { ClipboardList, User, MapPin, Calendar } from 'lucide-react';
 import { router } from 'expo-router';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 
@@ -18,11 +18,6 @@ interface Case {
 }
 
 const Volunteer: React.FC = () => {
-  const [currentView, setCurrentView] = useState<'queue' | 'review'>('queue');
-  const [selectedCase, setSelectedCase] = useState<Case | null>(null);
-  const [reviewNotes, setReviewNotes] = useState('');
-  const [questionText, setQuestionText] = useState('');
-
   // Mock case data
   const cases: Case[] = [
     {
@@ -76,8 +71,14 @@ const Volunteer: React.FC = () => {
     }
   };
 
-  // Queue View
-  const QueueView = () => (
+  const handleReviewCase = (caseItem: Case) => {
+    router.push({
+      pathname: '/(tabs)/volunteer-review',
+      params: { caseData: JSON.stringify(caseItem) }
+    });
+  };
+
+  return (
     <ParallaxScrollView
       headerImage={
         <div className="parallax-header">
@@ -90,10 +91,6 @@ const Volunteer: React.FC = () => {
     >
       <div className="volunteer-container">
         <div className="content-wrapper">
-          <button onClick={() => router.push('/')} className="back-button">
-            ← Back to Home
-          </button>
-          
           <div className="card-container">
             <div className="header-section">
               <div className="header-left">
@@ -159,10 +156,7 @@ const Volunteer: React.FC = () => {
                   <p className="case-description">{caseItem.description}</p>
                   
                   <button 
-                    onClick={() => {
-                      setSelectedCase(caseItem);
-                      setCurrentView('review');
-                    }}
+                    onClick={() => handleReviewCase(caseItem)}
                     className="review-button"
                   >
                     Review Case
@@ -174,185 +168,6 @@ const Volunteer: React.FC = () => {
         </div>
       </div>
     </ParallaxScrollView>
-  );
-
-  // Review View
-  const ReviewView = () => {
-    if (!selectedCase) return null;
-
-    const handleAccept = () => {
-      alert('Case approved and sent to patient!');
-      setCurrentView('queue');
-      setSelectedCase(null);
-    };
-
-    const handleAskQuestion = () => {
-      if (questionText.trim()) {
-        alert(`Question sent to patient: ${questionText}`);
-        setQuestionText('');
-      }
-    };
-
-    const handlePrescribe = () => {
-      alert('Prescription request sent to supervisor for approval');
-      setCurrentView('queue');
-      setSelectedCase(null);
-    };
-
-    const handleOutOfScope = () => {
-      alert('Patient has been notified to seek local medical attention');
-      setCurrentView('queue');
-      setSelectedCase(null);
-    };
-
-    return (
-      <ParallaxScrollView
-        headerImage={
-          <div className="parallax-header">
-            <div className="header-gradient">
-              <FileText size={80} color="white" style={{ opacity: 0.9 }} />
-            </div>
-          </div>
-        }
-        headerBackgroundColor={{ light: '#16a34a', dark: '#15803d' }}
-      >
-        <div className="volunteer-container">
-          <div className="content-wrapper">
-            <button 
-              onClick={() => {
-                setCurrentView('queue');
-                setSelectedCase(null);
-              }} 
-              className="back-button"
-            >
-              ← Back to Queue
-            </button>
-            
-            <div className="card-container">
-              <div className="header-section">
-                <div className="header-left">
-                  <div className="icon-circle green">
-                    <FileText size={28} />
-                  </div>
-                  <div>
-                    <h2 className="page-title">Case #{selectedCase.id}</h2>
-                    <p className="page-subtitle">Review & Take Action</p>
-                  </div>
-                </div>
-                <span className={`severity-badge ${getSeverityColor(selectedCase.severity)}`}>
-                  {selectedCase.severity} Severity
-                </span>
-              </div>
-
-              <div className="info-box">
-                <h3 className="info-box-title">Patient Information</h3>
-                <div className="info-box-grid">
-                  <div>
-                    <span className="info-label">Age:</span>
-                    <p className="info-value">{selectedCase.age} years</p>
-                  </div>
-                  <div>
-                    <span className="info-label">Gender:</span>
-                    <p className="info-value">{selectedCase.gender}</p>
-                  </div>
-                  <div>
-                    <span className="info-label">Location:</span>
-                    <p className="info-value">{selectedCase.location}</p>
-                  </div>
-                  <div>
-                    <span className="info-label">Duration:</span>
-                    <p className="info-value">{selectedCase.duration}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="info-box">
-                <h3 className="info-box-title">Reported Symptoms</h3>
-                <div className="symptoms-list">
-                  {selectedCase.symptoms.map((symptom, idx) => (
-                    <span key={idx} className="symptom-tag">
-                      {symptom}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="info-box">
-                <h3 className="info-box-title">Patient Description</h3>
-                <p className="info-text">{selectedCase.description}</p>
-              </div>
-
-              <div className="info-box ai-box">
-                <h3 className="info-box-title">
-                  <AlertCircle size={20} />
-                  AI Preliminary Diagnosis
-                </h3>
-                <p className="info-text">{selectedCase.aiDiagnosis}</p>
-              </div>
-
-              <div className="info-box">
-                <h3 className="info-box-title">
-                  <MessageSquare size={20} />
-                  Ask Follow-up Question
-                </h3>
-                <div className="question-input-group">
-                  <input
-                    type="text"
-                    value={questionText}
-                    onChange={(e) => setQuestionText(e.target.value)}
-                    placeholder="Type your question for the patient..."
-                    className="text-input"
-                  />
-                  <button
-                    onClick={handleAskQuestion}
-                    className="send-button"
-                  >
-                    Send
-                  </button>
-                </div>
-              </div>
-
-              <div className="info-box">
-                <h3 className="info-box-title">Your Review Notes (Optional)</h3>
-                <textarea
-                  value={reviewNotes}
-                  onChange={(e) => setReviewNotes(e.target.value)}
-                  placeholder="Add any notes or modifications to the diagnosis..."
-                  className="textarea-input"
-                />
-              </div>
-
-              <div className="action-buttons">
-                <button onClick={handleAccept} className="action-btn accept-btn">
-                  <CheckCircle size={20} />
-                  Accept
-                </button>
-                <button onClick={handlePrescribe} className="action-btn prescribe-btn">
-                  Prescribe OTC
-                </button>
-                <button onClick={handleOutOfScope} className="action-btn scope-btn">
-                  Out of Scope
-                </button>
-                <button onClick={() => {
-                  setCurrentView('queue');
-                  setSelectedCase(null);
-                }} className="action-btn cancel-btn">
-                  <X size={20} />
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </ParallaxScrollView>
-    );
-  };
-
-  return (
-    <div>
-      {currentView === 'queue' && <QueueView />}
-      {currentView === 'review' && <ReviewView />}
-    </div>
   );
 };
 

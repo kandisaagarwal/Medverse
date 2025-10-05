@@ -78,6 +78,7 @@ const Home: React.FC = () => {
               </div>
             </button>
 
+
             {/* Supervisor Portal */}
             <button 
               className="portal-card supervisor-portal"
