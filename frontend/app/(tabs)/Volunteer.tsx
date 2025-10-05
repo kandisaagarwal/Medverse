@@ -199,50 +199,45 @@ const Volunteer: React.FC = () => {
   const [volunteerId, setVolunteerId] = useState<string | null>(null);
 
   // Fetch cases from backend API
-    const fetchCases = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        const demoVolunteerId = '68e243e34bbacf29c6509379';
-        
-        const response = await fetch('http://localhost:3000/volunteer/getFirst', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            volunteer_id: demoVolunteerId
-          })
-        });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch cases');
-      }
-      
-      const data = await response.json();
-      console.log('Backend response:', data);
-      
-      // Transform the backend data to match your frontend interface
-      if (data.report) {
-        const transformedCase: Case = {
-          id: data.report._id || data.report.id || 1001,
-          age: data.report.age || 0,
-          gender: data.report.gender || 'Unknown',
-          location: data.report.location || 'Unknown',
-          severity: data.report.severity || 'low',
-          symptoms: data.report.symptoms || [],
-          description: data.report.description || 'No description provided',
-          duration: data.report.duration || 'Unknown',
-          timeAgo: 'Recently', // You might want to calculate this from createdAt
-          aiDiagnosis: data.report.diagnosis ? data.report.diagnosis.join(', ') : 'No diagnosis yet'
-        };
-        setCases([transformedCase]);
-      } else {
-        setCases([]);
-      }
-      
-    } catch (err) {
+  const fetchCases = async () => {
+  const demoVolunteerId = '68e243ce4bbacf29c6509377';
+  try {
+    const response = await fetch('http://localhost:3000/volunteer/getFirst', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        volunteer_id: demoVolunteerId
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch cases');
+    }
+
+    const data = await response.json();
+
+    if (data.report) {
+      const transformedCase: Case = {
+        id: data.report._id || data.report.id || 1001,
+        age: data.report.age || 0,
+        gender: data.report.gender || 'Unknown',
+        location: data.report.location
+          ? `(${data.report.location.coordinates[1]}, ${data.report.location.coordinates[0]})`
+          : 'Unknown',
+        severity: data.report.severity || 'low',
+        symptoms: data.report.symptoms || [],
+        description: data.report.description || 'No description provided',
+        duration: data.report.duration || 'Unknown',
+        timeAgo: 'Recently', // You might want to calculate this from createdAt
+        aiDiagnosis: data.report.diagnosis ? data.report.diagnosis.join(', ') : 'No diagnosis yet'
+      };
+      setCases([transformedCase]);
+    } else {
+      setCases([]);
+    }
+  } catch (err) {
       console.error('Error fetching cases:', err);
       
       // Fallback to demo data if backend fails
