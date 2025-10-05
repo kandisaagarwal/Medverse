@@ -71,7 +71,7 @@ const Patient: React.FC = () => {
             value={genderValue || answers.gender}
             items={questions[currentStep].options!}
             setOpen={setOpen}
-            setValue={(callbackOrValue) => {
+            setValue={(callbackOrValue: string | ((prev: string | null) => string)) => {
               const value = typeof callbackOrValue === 'function' ? callbackOrValue(genderValue) : callbackOrValue;
               setGenderValue(value);
               handleChange(value as string);
