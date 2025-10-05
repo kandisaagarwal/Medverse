@@ -18,6 +18,7 @@ const genderOptions = [
   { label: 'Prefer not to say', value: 'Prefer not to say' },
 ];
 
+
 const questions = [
   { key: 'email', type: 'input', question: 'What is your email?', placeholder: 'Enter your email', keyboardType: 'email-address' },
   { key: 'gender', type: 'picker', question: 'What is your gender?', options: genderOptions },
@@ -37,9 +38,12 @@ const Patient: React.FC = () => {
     if (currentStep < questions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      const answersJSON = JSON.stringify(answers);
-      console.log(answersJSON);
-      router.push('./Chat');
+      console.log(answers);
+      router.push({
+      pathname: './Chat',
+      params: { answers: JSON.stringify(answers) },
+    });
+
     }
   };
 

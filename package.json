@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "expo-image-picker": "^17.0.8",
     "lucide-react": "^0.544.0",
-    "react-native-dropdown-picker": "^5.4.6"
+    "react-native-dropdown-picker": "^5.4.6",
+    "react-native-fs": "^2.20.0"
   }
 }

@@ -1,5 +1,5 @@
 // app/chat.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -11,9 +11,9 @@ import {
   Platform,
   Alert,
   Image,
-  Dimensions,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useLocalSearchParams } from 'expo-router';
 
 interface Message {
   id: string;
@@ -23,35 +23,150 @@ interface Message {
 }
 
 export default function Chat() {
-  const [messages, setMessages] = useState<Message[]>([
-    { id: '1', text: 'Hey! How are you?', sender: 'other' },
-    { id: '2', text: 'I am good, thanks!', sender: 'me' },
-  ]);
+  console.log("Chat mounted");
+  const { answers } = useLocalSearchParams();
+  console.log(answers);
+
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [input, setInput] = useState('');
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
-    const newMessage: Message = { id: Math.random().toString(), text: input, sender: 'me' };
-    setMessages([...messages, newMessage]);
-    setInput('');
+  const flatListRef = useRef<FlatList>(null);
+
+  // Auto-scroll to latest message
+  useEffect(() => {
+    if (messages.length > 0) {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    }
+  }, [messages]);
+
+  // Parse user demographics
+  const parsedAnswers = answers ? JSON.parse(answers as string) : {};
+  const demographics = {
+    age: parsedAnswers.age || '',
+    gender: parsedAnswers.gender || '',
+    country: parsedAnswers.country || '',
+    city: parsedAnswers.city || '',
+    email: parsedAnswers.email || ''
   };
 
+  // Fetch initial bot message
+  useEffect(() => {
+    const fetchInitialMessage = async () => {
+      try {
+        const initial_input = {
+          message: "Hi, I need some medical advice",
+          prefilledDemographics: demographics
+        };
+
+        const response = await fetch("http://localhost:3000/reports/chat", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(initial_input),
+        });
+
+        const data = await response.json();
+
+        if (data.reply) {
+          setMessages([
+            { id: "initial_0", text: data.reply, sender: 'other' },
+          ]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch initial message:", error);
+        Alert.alert("Connection Error", "Could not connect to the server. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInitialMessage();
+  }, []);
+
+  // Pick image and send to server
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.7,
     });
+
     if (!result.canceled && result.assets.length > 0) {
       const imageUri = result.assets[0].uri;
       const newMessage: Message = { id: Math.random().toString(), imageUri, sender: 'me' };
-      setMessages([...messages, newMessage]);
+      setMessages(prev => [...prev, newMessage]);
+
+      // Send image to server
+      try {
+        const response = await fetch("http://localhost:3000/reports/chat", {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageUri, prefilledDemographics: demographics }),
+        });
+
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+        const data = await response.json();
+
+        if (data.reply) {
+          const botMessage: Message = { id: Math.random().toString(), text: data.reply, sender: 'other' };
+          setMessages(prev => [...prev, botMessage]);
+        }
+      } catch (error) {
+        console.error("Failed to send image:", error);
+        Alert.alert("Error", "Failed to send image. Please try again.");
+      }
     }
   };
 
-  const endConversation = () => {
+  // Send text message
+  const sendMessage = async () => {
+    if (!input.trim()) return;
+
+    const userMessage: Message = { id: Math.random().toString(), text: input, sender: 'me' };
+    setMessages(prev => [...prev, userMessage]);
+
+    const messageToSend = input;
+    setInput('');
+
+    try {
+      const response = await fetch("http://localhost:3000/reports/chat", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: messageToSend, prefilledDemographics: demographics }),
+      });
+
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+      const data = await response.json();
+
+      if (data.reply) {
+        const botMessage: Message = { id: Math.random().toString(), text: data.reply, sender: 'other' };
+        setMessages(prev => [...prev, botMessage]);
+      }
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      Alert.alert("Error", "Failed to send message. Please try again.");
+    }
+  };
+
+  // End conversation and notify server
+  const endConversation = async () => {
     Alert.alert('End Conversation', 'Are you sure you want to end the conversation?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Yes', style: 'destructive', onPress: () => setMessages([]) },
+      {
+        text: 'Yes',
+        style: 'destructive',
+        onPress: async () => {
+          setMessages([]);
+          try {
+            await fetch("http://localhost:3000/reports/chat/end", {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ prefilledDemographics: demographics }),
+            });
+          } catch (error) {
+            console.error("Failed to end conversation on server:", error);
+          }
+        }
+      },
     ]);
   };
 
@@ -74,6 +189,7 @@ export default function Chat() {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <FlatList
+        ref={flatListRef}
         data={messages}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
